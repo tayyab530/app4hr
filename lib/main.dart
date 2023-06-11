@@ -1,9 +1,27 @@
-import 'package:app4hr/screens/dashboard.dart';
+import 'package:app4hr/screens/client_dashboard.dart';
+import 'package:app4hr/utils/firestore.dart';
 import 'package:app4hr/widgets/login_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+import 'models/applications.dart';
+import 'models/candidate.dart';
+import 'models/positions.dart';
+import 'utils/authentication.dart';
 
 void main() async{
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  WidgetsFlutterBinding.ensureInitialized();
+
+  FirestoreService fireStoreService = FirestoreService();
+
+  // await fireStoreService.addDemoPositions();
+
+  // var list = (await fireStoreService.getAllPositions()).map((e) => e.id).toList();
+  // print(list);
   runApp(const MyApp());
 }
 
@@ -24,5 +42,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 

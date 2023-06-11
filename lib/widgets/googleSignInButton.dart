@@ -1,6 +1,8 @@
+import 'package:app4hr/utils/firestore.dart';
 import 'package:flutter/material.dart';
 import '../utils/authentication.dart';
 import '../utils/navigation_functions.dart';
+import 'popups.dart';
 
 class GoogleButton extends StatefulWidget {
   const GoogleButton({super.key});
@@ -11,6 +13,7 @@ class GoogleButton extends StatefulWidget {
 
 class _GoogleButtonState extends State<GoogleButton> {
   bool _isProcessing = false;
+  FirestoreService firestoreService = FirestoreService();
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +38,29 @@ class _GoogleButtonState extends State<GoogleButton> {
           setState(() {
             _isProcessing = true;
           });
-          await signInWithGoogle().then((result) {
+          await signInWithGoogle().then((result) async {
             print(result);
             if (result != null) {
-              // Navigator.of(context).pop();
-              // Navigator.of(context).pushReplacement(
-              //   MaterialPageRoute(
-              //     fullscreenDialog: true,
-              //     builder: (context) => Scaffold(body: Container()),
-              //   ),
-              // );
-              gotoDashboard(context);
+              var data = (await firestoreService.getUserById(user!.uid))!.data();
+              if(data == null){
+                await firestoreService.addUser(user!);
+              }
+              else if(data!["isAdmin"]){
+                gotoAdminDashboard(context);
+              }
+              else{
+                gotoClientDashboard(context);
+              }
               print("Successfully created");
+            }
+            else{
+              var loginStatus = 'Error occurred while signing in';
+              Popups.showErrorPopup(context, loginStatus);
             }
           }).catchError((error) {
             print('Registration Error: $error');
+            var loginStatus = 'Error occurred while signing in';
+            Popups.showErrorPopup(context, loginStatus);
           });
           setState(() {
             _isProcessing = false;

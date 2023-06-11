@@ -13,6 +13,8 @@ String? userEmail;
 String? name;
 String? imageUrl;
 
+User? user;
+
 FirebaseOptions firebaseOptions =  const FirebaseOptions(
     apiKey: "AIzaSyAHr1LoM2HwpV6KWgj4Nc_OrpY4ERfjIlw",
     authDomain: "app4hr-a0867.firebaseapp.com",
@@ -24,10 +26,9 @@ FirebaseOptions firebaseOptions =  const FirebaseOptions(
 
 Future<User?> registerWithEmailPassword(String email, String password) async {
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: firebaseOptions,
-  );
-  User? user;
+  // await Firebase.initializeApp(
+  //   options: firebaseOptions,
+  // );
 
   try {
     UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
@@ -38,8 +39,8 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
     user = userCredential.user;
 
     if (user != null) {
-      uid = user.uid;
-      userEmail = user.email;
+      uid = user!.uid;
+      userEmail = user!.email;
     }
   }on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
@@ -57,8 +58,7 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
 }
 
 Future<User?> signInWithEmailPassword(String email, String password) async {
-  await Firebase.initializeApp(options: firebaseOptions);
-  User? user;
+  // await Firebase.initializeApp(options: firebaseOptions);
 
   try {
     UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -68,8 +68,8 @@ Future<User?> signInWithEmailPassword(String email, String password) async {
     user = userCredential.user;
 
     if (user != null) {
-      uid = user.uid;
-      userEmail = user.email;
+      uid = user!.uid;
+      userEmail = user!.email;
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('auth', true);
@@ -84,15 +84,11 @@ Future<User?> signInWithEmailPassword(String email, String password) async {
 
     // Initialize Firebase
 
-
-
-
   return user;
 }
 
 Future<User?> signInWithGoogle() async {
   await Firebase.initializeApp(options: firebaseOptions);
-  User? user;
 
   // The `GoogleAuthProvider` can only be used while running on the web
   GoogleAuthProvider authProvider = GoogleAuthProvider();
@@ -102,15 +98,16 @@ Future<User?> signInWithGoogle() async {
         await _auth.signInWithPopup(authProvider);
 
     user = userCredential.user;
+
   } catch (e) {
     print(e);
   }
 
   if (user != null) {
-    uid = user.uid;
-    name = user.displayName;
-    userEmail = user.email;
-    imageUrl = user.photoURL;
+    uid = user!.uid;
+    name = user!.displayName;
+    userEmail = user!.email;
+    imageUrl = user!.photoURL;
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('auth', true);

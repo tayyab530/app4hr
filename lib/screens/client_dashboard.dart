@@ -1,25 +1,32 @@
-import 'dart:math';
-
+import 'package:app4hr/pages/position_page.dart';
 import 'package:app4hr/utils/authentication.dart';
+import 'package:app4hr/widgets/resume_popup.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/material.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key}) : super(key: key);
+import '../pages/admin/applications.dart';
+import '../pages/admin/candidates.dart';
+import '../pages/admin/home.dart';
+import '../pages/admin/positions.dart';
+import '../utils/navigation_functions.dart';
+
+class ClientDashboard extends StatefulWidget {
+  const ClientDashboard({Key? key}) : super(key: key);
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<ClientDashboard> createState() => _ClientDashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class _ClientDashboardState extends State<ClientDashboard> {
   late List<CollapsibleItem> _items;
   late String _headline;
+  late Widget _page;
 
   @override
   void initState() {
     _items = _generateItems;
     _headline = _items.firstWhere((item) => item.isSelected).text;
-
+    _page = const PositionsScreen();
     super.initState();
   }
 
@@ -41,28 +48,38 @@ class _DashboardState extends State<Dashboard> {
               Icons.person,
               color: Colors.white,
             ),
-            onPressed: () {},
+            onPressed: () {
+              showDialog(context: context, builder: (ctx){
+                return const ResumeUploadPopup();
+              });
+            },
           ),
           IconButton(
             icon: const Icon(
-              Icons.settings,
+              Icons.logout,
               color: Colors.white,
             ),
-            onPressed: () {},
+            onPressed: () async{
+              await signOut();
+              signOutGoogle();
+              gotoLogin(context);
+            },
           ),
         ],
       ),
       body: CollapsibleSidebar(
-        isCollapsed: MediaQuery.of(context).size.width <= 800,
+        isCollapsed: true,
         items: _items,
-        collapseOnBodyTap: false,
+        collapseOnBodyTap: true,
         // avatarImg: _avatarImg,
         title: name ?? userEmail ?? "User",
-        onTitleTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Yay! Flutter Collapsible Sidebar!')));
-        },
-        body: _body(size, context),
+        // onTitleTap: () {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //       const SnackBar(content: Text('Yay! Flutter Collapsible Sidebar!')));
+        // },
+        body: Container(
+            padding: const EdgeInsets.only(left: 20.0,top: 20),
+            child: _body(size, context)),
         backgroundColor: Colors.blue.shade900,
         selectedTextColor: Colors.limeAccent,
         textStyle: const TextStyle(fontSize: 15, fontStyle: FontStyle.italic),
@@ -90,35 +107,17 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Widget _body(Size size, BuildContext context) {
-    return Container(
-      height: double.infinity,
-      width: double.infinity,
-      color: Colors.blueGrey[50],
-      child: Center(
-        child: Transform.rotate(
-          angle: pi / 2,
-          child: Transform.translate(
-            offset: Offset(-size.height * 0.3, -size.width * 0.23),
-            child: Text(
-              _headline,
-              style: Theme.of(context).textTheme.headline1,
-              overflow: TextOverflow.visible,
-              softWrap: false,
-            ),
-          ),
-        ),
-      ),
-    );
+    return _page;
   }
 
   List<CollapsibleItem> get _generateItems {
     return [
       CollapsibleItem(
-        text: 'Dashboard',
+        text: 'Home',
         icon: Icons.assessment,
-        onPressed: () => setState(() => _headline = 'DashBoard'),
+        onPressed: () => setState(() => _page = const PositionsScreen()),
         onHold: () => ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Dashboard"))
+            const SnackBar(content: Text("Home"))
         ),
         isSelected: true,
       ),
