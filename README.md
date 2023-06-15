@@ -1,16 +1,1 @@
-# app4hr
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<div class="markdown prose w-full break-words dark:prose-invert dark"><h1>App4HR</h1><p>App4HR is a web-based Flutter app that revolutionizes the hiring process by allowing candidates to upload their resumes and receive instant AI responses indicating acceptance or rejection. The HR individuals can view the candidates' applications along with AI decisions and explanatory charts, providing insights into the reasons behind the AI's decision-making process.</p><h2>Features 🚀</h2><p>✅ Resume Upload: Candidates can easily upload their resumes through the web interface for evaluation.</p><p>✅ Instant AI Response: The AI system processes the uploaded resumes and provides instant feedback, indicating whether the candidate is accepted or rejected.</p><p>✅ Explainable Charts: HR individuals can visualize the AI decision-making process through intuitive and explanatory charts, helping them understand the factors influencing the decision.</p><p>✅ Flutter Web Frontend: The frontend of the application is built using Flutter Web, providing a seamless and responsive user experience across different devices and platforms.</p><p>✅ Firebase Backend: The backend of the application is powered by Firebase, offering secure and scalable data storage and retrieval.</p><h2>How to Use 📖</h2><ol><li><p>Access the App4HR web application using a compatible web browser.</p></li><li><p>Candidates can create an account or log in to their existing account.</p></li><li><p>Upload your resume using the provided interface and wait for the AI response.</p></li><li><p>HR individuals can log in to their accounts to access the candidate applications and view the AI decisions and explanatory charts.</p></li></ol><h2>Technologies Used 💻</h2><ul><li><p>Flutter Web: Frontend development framework for building a responsive and interactive user interface.</p></li><li><p>Firebase: Backend platform used for secure data storage and retrieval.</p></li></ul><h2>Installation and Setup ⚙️</h2><ol><li><p>Clone the repository.</p></li><li><p>Install Flutter and set up the Flutter environment.</p></li><li><p>Run <code>flutter pub get</code> to install the required dependencies.</p></li><li><p>Set up a Firebase project and configure the necessary Firebase services.</p></li><li><p>Connect the Flutter app with the Firebase project by adding the required configuration files.</p></li><li><p>Build and run the Flutter app using the appropriate commands for Flutter web.</p></li></ol>
