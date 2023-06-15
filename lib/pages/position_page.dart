@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:html' as html;
+import 'dart:typed_data';
 
 import 'package:app4hr/models/applications.dart';
 import 'package:app4hr/utils/authentication.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -22,9 +26,10 @@ class PositionsScreen extends StatefulWidget {
 }
 
 class _PositionsScreenState extends State<PositionsScreen> {
-  List<Position> _positions = []; // Positions list fetched from Firestore
+  List<PositionData> _positions = []; // Positions list fetched from Firestore
   List<Application>? _applications;
   FirestoreService _fireStoreService = FirestoreService();
+  final FirebaseStorage storage = FirebaseStorage.instance;
 
   @override
   void initState() {
@@ -68,16 +73,31 @@ class _PositionsScreenState extends State<PositionsScreen> {
               height: 20,
             ),
             Container(
-                height: MediaQuery.of(context).size.height * 0.35,
+                height: MediaQuery.of(context).size.height * 0.32,
                 // width: MediaQuery.of(context).size.width * 0.5,
                 // padding: const EdgeInsets.symmetric(horizontal: 30.0,vertical: 15),
                 child: _buildPositionsList()),
+            const SizedBox(
+              height: 20,
+            ),
+            const Text(
+              "Applications",
+              textAlign: TextAlign.left,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
             Card(
               elevation: 3.0,
               margin: const EdgeInsets.symmetric(vertical: 8.0),
               child: ListTile(
                 title: const Text(
-                  "PositionId",
+                  "Position Name",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18.0,
@@ -110,7 +130,7 @@ class _PositionsScreenState extends State<PositionsScreen> {
               ),
             ),
             Container(
-                height: MediaQuery.of(context).size.height * 0.35,
+                height: MediaQuery.of(context).size.height * 0.32,
                 // width: MediaQuery.of(context).size.width * 0.5,
                 // padding: const EdgeInsets.symmetric(horizontal: 30.0,vertical: 15),
                 child: _buildApplicationsList()),
@@ -129,7 +149,7 @@ class _PositionsScreenState extends State<PositionsScreen> {
       return ListView.builder(
         itemCount: _positions.length,
         itemBuilder: (context, index) {
-          Position position = _positions[index];
+          PositionData position = _positions[index];
           return Card(
             elevation: 3.0,
             margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -177,7 +197,7 @@ class _PositionsScreenState extends State<PositionsScreen> {
         itemCount: _applications!.length,
         itemBuilder: (context, index) {
           Application application = _applications![index];
-          Position position = _positions.firstWhere((p) => p.id == application.positionId);
+          PositionData position = _positions.firstWhere((p) => p.id == application.positionId);
           return Card(
             elevation: 3.0,
             margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -235,7 +255,9 @@ class _PositionsScreenState extends State<PositionsScreen> {
     }
   }
 
-  Future<void> _applyForPosition(BuildContext context,Position positionData) async {
+  Future<void> _applyForPosition(BuildContext context,PositionData positionData) async {
+
+    Popups.showProgressPopup(context);
     // Show file picker to select resume file
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
@@ -258,48 +280,52 @@ class _PositionsScreenState extends State<PositionsScreen> {
         // var candidateName = FirestoreService().getCandidateName(ca)
         var requestBody = {
           "position": "${positionData.title} ${positionData.description}",
-          "resume": extractedText
+          "resume": extractedText,
+          "candidate_name": "Candidate",
+          "company_name": "Tayyab, HR at App4HR",
         };
 
         print(requestBody);
-        http.Response? response;
-        // response =
-        //     await http.post(Uri.parse('http://localhost:5000/xai'), body: jsonEncode(requestBody),headers: {"Content-Type":"application/json"});
-        response = await Future.delayed(const Duration(seconds: 2),(){
-          var dummyBody = getMockBody();
 
-          return response = http.Response(jsonEncode(dummyBody), 200);
-        });
+        var url = "api_url_here";
+        http.Response? response = await http.post(Uri.parse(url), body: jsonEncode(requestBody),headers: {"Content-Type":"application/json"});
+        // response = await Future.delayed(const Duration(seconds: 2),(){
+        //   var dummyBody = getMockBody();
+        //
+        //   return response = http.Response(jsonEncode(dummyBody), 200);
+        // });
         // var response = http.Response("Nothing", 200);
 
         print(response!.body);
         if(response!.statusCode == 200){
           try {
             var decodedBody = jsonDecode(response!.body);
-            var email = getMockBody()["email"];
-            var explanation = getMockBody()["explanation"];
+            var email = decodedBody["email"];
+            var explanation = decodedBody["explanations"];
 
             print(explanation);
-            print({"Name": 0.333});
+            var htmlResumeFileBytes = resumeFile.bytes!;
 
+            var resumeLink = await uploadResume(htmlResumeFileBytes, user!.uid);
             var application = Application(
               id: " ",
               candidateId: user!.uid,
               positionId: positionData.id,
               status: "pending",
               date: DateTime.now(),
-              aiDecision: false,
+              aiDecision: decodedBody["call_for_interview"] == 1 ? true : false,
               hrDecision: false,
               email: email,
               explanation: explanation,
+              downloadableResumeLink: resumeLink,
             );
-            await _fireStoreService.addApplication(application).then((value) =>
-                refresh());
+            await _fireStoreService.addApplication(application);
             refresh();
-
+            Navigator.of(context).pop();
             Popups.showSuccessPopup(
                 context, "Application is submitted. You will receive email.");
           } catch (e) {
+            Navigator.of(context).pop();
             print(e.toString());
             Popups.showErrorPopup(
                 context,
@@ -308,10 +334,12 @@ class _PositionsScreenState extends State<PositionsScreen> {
 
         }
         else{
+          Navigator.of(context).pop();
           Popups.showErrorPopup(
               context,
               "Failed to submit your application. Please try again.");
         }
+        Navigator.of(context).pop();
 
         // if (response!.statusCode == 200) {
         //   // Successful submission
@@ -341,17 +369,23 @@ class _PositionsScreenState extends State<PositionsScreen> {
         // else {
         //   // Handle submission failure
         // }
-      } else {
+      }
+      else {
         // Handle PDF to text extraction failure
+        Navigator.of(context).pop();
         Popups.showErrorPopup(
             context, "Failed to extract text from the PDF file.");
       }
     }
+    else{
+      Navigator.of(context).pop();
+    }
   }
 
   refresh(){
-    setState(() {
-    });
+    html.window.location.reload();
+    // setState(() {
+    // });
   }
 
   Map<String,dynamic> getMockBody(){
@@ -372,5 +406,30 @@ class _PositionsScreenState extends State<PositionsScreen> {
     };
   }
 
+  Future<String> uploadResume(Uint8List fileBytes,String uid) async {
+    // Create a unique filename for the resume
+    String fileName = '$uid.pdf';
 
+    try {
+      // Get a reference to the file in Firebase Storage
+      Reference reference = storage.ref().child(fileName);
+
+      // Upload the file to Firebase Storage
+      await reference.putData(fileBytes);
+
+      // Get the download URL of the uploaded file
+      String downloadURL = await reference.getDownloadURL();
+
+      // Return the download URL to save it in the Firestore or use it as needed
+      return downloadURL;
+    } catch (e) {
+      print('Error uploading resume: $e');
+      return '';
+    }
+  }
+
+  // Future<File> convertPlatformFileToWebFile(PlatformFile platformFile) async {
+  //   final bytes = html.File(platformFile.bytes!, platformFile.name);
+  //   return File.fromRawPath(bytes);
+  // }
 }

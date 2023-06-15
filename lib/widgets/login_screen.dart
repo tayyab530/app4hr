@@ -221,6 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
         onPressed: () async {
+          await signOut();
           setState(() {
             _isRegistering = true;
           });
@@ -231,14 +232,20 @@ class _LoginScreenState extends State<LoginScreen> {
               loginStatus = 'You have registered successfully';
               loginStringColor = Colors.green;
 
-              gotoClientDashboard(context);
+              if(result.emailVerified){
+                gotoClientDashboard(context);
+              }
+              else{
+                Popups.showSuccessPopup(context, "Verfication is sent to your email. Please verify it.");
+              }
+
               print(result);
 
               await fireStoreService.addUser(user!);
             } else {
               loginStatus = 'Error occurred while registering';
               loginStringColor = Colors.green;
-              Popups.showErrorPopup(context, loginStatus);
+              Popups.showErrorPopup(context, error?? loginStatus);
             }
           }).catchError((error) {
             print('Registration Error: $error');
@@ -294,24 +301,26 @@ class _LoginScreenState extends State<LoginScreen> {
           await signInWithEmailPassword(
                   textControllerEmail.text, textControllerPassword.text)
               .then((result) async {
-            if (result != null) {
-
+            if (user!.emailVerified) {
+              if (result != null) {
                 loginStatus = 'You have logged in successfully';
                 loginStringColor = Colors.green;
-              var isAdmin = (await fireStoreService.getUserById(user!.uid))!
-                  .data()!["isAdmin"];
-              if (isAdmin) {
-                gotoAdminDashboard(context);
+                var isAdmin = (await fireStoreService.getUserById(user!.uid))!
+                    .data()!["isAdmin"];
+                if (isAdmin) {
+                  gotoAdminDashboard(context);
+                } else {
+                  gotoClientDashboard(context);
+                }
+                print("isAdmin: ${isAdmin.toString()}");
+                print(result);
+              } else {
+                loginStatus = 'Credentials are not correct';
+                loginStringColor = Colors.green;
+                Popups.showErrorPopup(context, loginStatus);
               }
-              else{
-                gotoClientDashboard(context);
-              }
-              print("isAdmin: ${isAdmin.toString()}");
-              print(result);
             } else {
-              loginStatus = 'Credentials are not correct';
-              loginStringColor = Colors.green;
-              Popups.showErrorPopup(context, loginStatus);
+              Popups.showWarningPopup(context, "Please verify your email.");
             }
           }).catchError((error) {
             print('Signin Error: $error');

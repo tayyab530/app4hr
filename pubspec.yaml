@@ -48,6 +48,10 @@ dependencies:
   syncfusion_flutter_charts: ^21.2.6
   fl_chart: ^0.62.0
   intl: ^0.18.1
+  firebase_storage: ^11.2.2
+  syncfusion_flutter_pdfviewer: ^21.2.10
+  native_pdf_view: ^4.2.0
+  internet_file: ^1.2.0
 
 dev_dependencies:
   flutter_test:

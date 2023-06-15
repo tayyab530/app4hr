@@ -1,3 +1,4 @@
+import 'package:app4hr/pages/admin/positionForm.dart';
 import 'package:app4hr/utils/firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class Positions extends StatefulWidget {
 FirestoreService firestoreService = FirestoreService();
 
 class _PositionsState extends State<Positions> {
-  List<Position> positions = [];
+  List<PositionData> positions = [];
   List<Application> applications = [];
 
   @override
@@ -28,7 +29,7 @@ class _PositionsState extends State<Positions> {
                 child: CircularProgressIndicator(),
               );
             }
-            positions = ss.data![0] as List<Position>;
+            positions = ss.data![0] as List<PositionData>;
             applications = ss.data![1] as List<Application>;
 
             return Padding(
@@ -40,15 +41,9 @@ class _PositionsState extends State<Positions> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        setState(() {
-                          positions.add(Position(
-                            id: '1',
-                            title: 'New Position',
-                            shortDescription: 'Short Description',
-                            description: 'Position Description',
-                            // applications: 0,
-                          ));
-                        });
+                        showDialog(context: context, builder: (ctx){
+                          return const AddPositionScreen();
+                        }).then((value) => setState((){}));
                       },
                       child: const Text('Add New Position'),
                     ),
@@ -79,7 +74,7 @@ class _PositionsState extends State<Positions> {
                       shrinkWrap: true,
                       itemCount: positions.length,
                       itemBuilder: (context, index) {
-                        Position position = positions[index];
+                        PositionData position = positions[index];
                         List<Application> listOfApp = applications
                             .where((app) => app.positionId == position.id)
                             .toList();

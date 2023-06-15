@@ -1,5 +1,7 @@
+import 'package:app4hr/screens/admin_dashboard.dart';
 import 'package:app4hr/screens/client_dashboard.dart';
 import 'package:app4hr/utils/firestore.dart';
+import 'package:app4hr/utils/navigation_functions.dart';
 import 'package:app4hr/widgets/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -33,15 +35,44 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'App4HR',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       // home: LoginScreen(),
-      home: LoginScreen(),
+      home: checkUserLoggedIn() ? DashboardSelector():LoginScreen(),
     );
   }
 }
+
+class DashboardSelector extends StatelessWidget {
+  DashboardSelector({Key? key}) : super(key: key);
+  final fireStoreService = FirestoreService();
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: FutureBuilder(
+        future: fireStoreService.checkIfUserIsAdmin(user!.uid),
+          builder: (ctx,AsyncSnapshot<bool?> ss){
+            if(ss.connectionState == ConnectionState.waiting){
+              return const Center(child: CircularProgressIndicator());
+            }
+            else if(ss.data == null){
+              return LoginScreen();
+            }
+            else if(ss.data!){
+              return const AdminDashboard();
+            }
+            else{
+              return const ClientDashboard();
+            }
+          }),
+    );
+  }
+}
+
+
+
 
 
 

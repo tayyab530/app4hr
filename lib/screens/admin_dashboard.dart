@@ -4,6 +4,7 @@ import 'package:app4hr/widgets/resume_popup.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/material.dart';
 
+import '../common/constants.dart';
 import '../pages/admin/applications.dart';
 import '../pages/admin/candidates.dart';
 import '../pages/admin/home.dart';
@@ -26,7 +27,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   void initState() {
     _items = _generateItems;
     _headline = _items.firstWhere((item) => item.isSelected).text;
-    _page = AdminHome();
+    _page = const AdminHome();
     super.initState();
   }
 
@@ -36,24 +37,25 @@ class _AdminDashboardState extends State<AdminDashboard> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          children: const [
-            Icon(Icons.star),
-            SizedBox(width: 4,),
-            Text("App4HR"),
+          children: [
+            Container(width: 24,height: 24,child: Image.asset("assets/images/logo_white.png")),
+            const SizedBox(width: 4,),
+            const Text("App4HR"),
           ],
         ),
+        backgroundColor: primaryColor,
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.person,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              showDialog(context: context, builder: (ctx){
-                return ResumeUploadPopup();
-              });
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(
+          //     Icons.person,
+          //     color: Colors.white,
+          //   ),
+          //   onPressed: () {
+          //     showDialog(context: context, builder: (ctx){
+          //       return const ResumeUploadPopup();
+          //     });
+          //   },
+          // ),
           IconButton(
             icon: const Icon(
               Icons.logout,
@@ -72,7 +74,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
         items: _items,
         collapseOnBodyTap: true,
         // avatarImg: _avatarImg,
-        title: name ?? userEmail ?? "User",
+        title: name ?? userEmail?.split("@").first ?? "User",
         // onTitleTap: () {
         //   ScaffoldMessenger.of(context).showSnackBar(
         //       const SnackBar(content: Text('Yay! Flutter Collapsible Sidebar!')));
@@ -115,7 +117,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       CollapsibleItem(
         text: 'Home',
         icon: Icons.assessment,
-        onPressed: () => setState(() => _page = AdminHome()),
+        onPressed: () => setState(() => _page = const AdminHome()),
         onHold: () => ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Home"))
         ),
@@ -124,7 +126,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       CollapsibleItem(
         text: 'Applications',
         icon: Icons.find_in_page,
-        onPressed: () => setState(() => _page = Applications()),
+        onPressed: () => setState(() => _page = const Applications()),
         onHold: () => ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Applications"))
         ),
@@ -139,15 +141,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
         ),
         isSelected: false,
       ),
-      CollapsibleItem(
-        text: 'Candidates',
-        icon: Icons.people,
-        onPressed: () => setState(() => _page = Candidates()),
-        onHold: () => ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Candidates"))
-        ),
-        isSelected: false,
-      ),
+      // CollapsibleItem(
+      //   text: 'Candidates',
+      //   icon: Icons.people,
+      //   onPressed: () => setState(() => _page = Candidates()),
+      //   onHold: () => ScaffoldMessenger.of(context).showSnackBar(
+      //       const SnackBar(content: Text("Candidates"))
+      //   ),
+      //   isSelected: false,
+      // ),
     ];
   }
 

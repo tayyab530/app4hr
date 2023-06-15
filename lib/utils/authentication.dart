@@ -15,6 +15,8 @@ String? imageUrl;
 
 User? user;
 
+String? error;
+
 FirebaseOptions firebaseOptions =  const FirebaseOptions(
     apiKey: "AIzaSyAHr1LoM2HwpV6KWgj4Nc_OrpY4ERfjIlw",
     authDomain: "app4hr-a0867.firebaseapp.com",
@@ -23,6 +25,24 @@ FirebaseOptions firebaseOptions =  const FirebaseOptions(
     messagingSenderId: "214736634664",
     appId: "1:214736634664:web:5c2cf70c78c5703b31c61d"
 );
+
+bool checkUserLoggedIn() {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+
+  if (currentUser != null) {
+    // User is signed in
+    print('User is logged in with UID: ${currentUser.uid}');
+    user = currentUser;
+    uid = user!.uid;
+    userEmail = user!.email;
+    imageUrl = user!.photoURL;
+    return true;
+  } else {
+    // User is not signed in
+    print('User is not logged in');
+    return false;
+  }
+}
 
 Future<User?> registerWithEmailPassword(String email, String password) async {
   // Initialize Firebase
@@ -38,6 +58,7 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
 
     user = userCredential.user;
 
+    user?.sendEmailVerification();
     if (user != null) {
       uid = user!.uid;
       userEmail = user!.email;
@@ -45,13 +66,16 @@ Future<User?> registerWithEmailPassword(String email, String password) async {
   }on FirebaseAuthException catch (e) {
     if (e.code == 'weak-password') {
       print('The password provided is too weak.');
+      error = "The password provided is too weak.";
     } else if (e.code == 'email-already-in-use') {
       print(e.message.toString());
       print('An account already exists for that email.');
+      error = "An account already exists for that email. Please sign in";
     }
   }
   catch (e) {
     print(e);
+    error = e.toString();
   }
 
   return user;
@@ -122,6 +146,7 @@ Future<String> signOut() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setBool('auth', false);
 
+  user = null;
   uid = null;
   userEmail = null;
 

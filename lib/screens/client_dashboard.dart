@@ -4,6 +4,7 @@ import 'package:app4hr/widgets/resume_popup.dart';
 import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/material.dart';
 
+import '../common/constants.dart';
 import '../pages/admin/applications.dart';
 import '../pages/admin/candidates.dart';
 import '../pages/admin/home.dart';
@@ -36,24 +37,25 @@ class _ClientDashboardState extends State<ClientDashboard> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          children: const [
-            Icon(Icons.star),
-            SizedBox(width: 4,),
-            Text("App4HR"),
+          children: [
+            Container(width: 24,height: 24,child: Image.asset("assets/images/logo_white.png")),
+            const SizedBox(width: 4,),
+            const Text("App4HR"),
           ],
         ),
+        backgroundColor: primaryColor,
         actions: <Widget>[
-          IconButton(
-            icon: const Icon(
-              Icons.person,
-              color: Colors.white,
-            ),
-            onPressed: () {
-              showDialog(context: context, builder: (ctx){
-                return const ResumeUploadPopup();
-              });
-            },
-          ),
+          // IconButton(
+          //   icon: const Icon(
+          //     Icons.person,
+          //     color: Colors.white,
+          //   ),
+          //   onPressed: () {
+          //     showDialog(context: context, builder: (ctx){
+          //       return const ResumeUploadPopup();
+          //     });
+          //   },
+          // ),
           IconButton(
             icon: const Icon(
               Icons.logout,

@@ -10,7 +10,8 @@ class Application {
   final bool hrDecision;
   final DateTime date;
   final String email;
-  final Map<String, double> explanation;
+  final Map<String, dynamic> explanation;
+  final String downloadableResumeLink;
 
   Application({
     required this.id,
@@ -22,6 +23,7 @@ class Application {
     required this.hrDecision,
     required this.email,
     required this.explanation,
+    required this.downloadableResumeLink,
   });
 
   factory Application.fromQuerySnapshot(DocumentSnapshot doc) {
@@ -35,7 +37,8 @@ class Application {
       aiDecision: data['aiDecision'],
       hrDecision: data['hrDecision'],
       email: data["email_content"],
-      explanation: Map<String,double>.from(data["explanation"]),
+      explanation: Map<String,double>.from(data["explanation"],),
+      downloadableResumeLink: data["downloadableResumeLink"],
     );
   }
 
@@ -49,6 +52,7 @@ class Application {
       "hrDecision": hrDecision,
       "email_content": email,
       "explanation": explanation,
+      "downloadableResumeLink": downloadableResumeLink,
     };
   }
 

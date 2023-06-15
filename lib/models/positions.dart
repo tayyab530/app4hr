@@ -1,22 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Position {
+class PositionData {
   final String id;
   final String title;
   final String shortDescription;
   final String description;
 
-  Position({
+  PositionData({
     required this.id,
     required this.title,
     required this.shortDescription,
     required this.description,
   });
 
-  factory Position.fromDocumentSnapshot(DocumentSnapshot snapshot) {
+  factory PositionData.fromDocumentSnapshot(DocumentSnapshot snapshot) {
     final data = snapshot.data() as Map<String, dynamic>;
 
-    return Position(
+    return PositionData(
       id: snapshot.id,
       title: data['title'] ?? '',
       shortDescription: data['shortDescription'] ?? '',
