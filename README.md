@@ -2,3 +2,6 @@
 <a href="https://app4hr-a0867.web.app/" target="_blank">
     Click here for Live Demo
 </a>
+<h3>Admin Credentials for Demo</h3>
+<p><b>Email: </b>danieli37100@gmail.com</p>
+<p><b>Password: </b>123123</p>
